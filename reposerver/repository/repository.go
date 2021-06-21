@@ -16,6 +16,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/argoproj/argo-cd/v2/util/config"
 	"github.com/Masterminds/semver"
 	"github.com/TomOnTime/utfutil"
 	"github.com/argoproj/gitops-engine/pkg/utils/kube"
@@ -1256,6 +1257,35 @@ func populateHelmAppDetails(res *apiclient.RepoAppDetailsResponse, appPath strin
 	if err != nil {
 		return err
 	}
+	bytes, readBytes, err := loadJsonFileIntoIfExists(filepath.Join(appPath, "values.schema.json"))
+	if err != nil {
+		return err
+	}
+	output, err := jsonParser(bytes, readBytes)
+	if err != nil {
+		return err
+	}
+	output = correction(output)
+	newoutput := mapToString(output)
+	res.Helm.Data = newoutput
+
+	/*for k, v := range params {
+		for kk, vv := range output {
+			if prefix(k, kk) == true {
+				res.Helm.Parameters = append(res.Helm.Parameters, &v1alpha1.HelmParameter{
+					Name: k,
+					Value: v,
+					Type: vv,
+				})
+			} else {
+				res.Helm.Parameters = append(res.Helm.Parameters, &v1alpha1.HelmParameter{
+					Name: k,
+					Value: v,
+					Type: nil,
+				})
+			}
+		}
+	}*/
 	for k, v := range params {
 		res.Helm.Parameters = append(res.Helm.Parameters, &v1alpha1.HelmParameter{
 			Name:  k,
@@ -1268,7 +1298,99 @@ func populateHelmAppDetails(res *apiclient.RepoAppDetailsResponse, appPath strin
 			Path: v.Path, //filepath.Join(appPath, v.Path),
 		})
 	}
+	
 	return nil
+}
+
+func checkPrefix(str1 string, str2 string) bool {
+	for i := range str1 {
+		if str1[i] != str2[i] {
+			return false
+		}
+	}
+	return true
+}
+
+func mapToString(input map[string]string) string {
+	str := ""
+	for k, v := range input {
+		str += k + ":" + v + " "
+	}
+	return str
+}
+
+func correction(input map[string]string) map[string]string {
+	for k, v := range input {
+		if len(k) < 10 || k[:10] != "properties" {
+			delete(input, k)
+		} else if v == "object" {
+			delete(input, k)
+		}
+	}
+	output := map[string]string{}
+	for k, v := range input {
+		kk := strings.Split(k, ".")
+		newstr := ""
+		i := 1
+		for i < len(kk) {
+			newstr += kk[i]
+			newstr += "."
+			i += 2
+		}
+		//newstr = newstr[:len(newstr)-1]
+		newstr += kk[len(kk)-1]
+		output[newstr] = v
+	}
+	return output
+}
+
+func jsonParser(bytes []byte, readBytes string) (map[string]string, error) {
+	mdata := map[string]interface{}{}
+	output := map[string]string{}
+	if err := json.Unmarshal(bytes, &mdata); err != nil {
+		return nil, err
+	}
+	flatVals(mdata, output)
+	return output, nil
+}
+
+func flatVals(input interface{}, output map[string]string, prefixes ...string) {
+	switch i := input.(type) {
+	case map[string]interface{}:
+		for k, v := range i {
+			flatVals(v, output, append(prefixes, k)...)
+		}
+	case []interface{}:
+		for j, v := range i {
+			flatVals(v, output, append(prefixes[0:len(prefixes)-1], fmt.Sprintf("%s[%v]", prefixes[len(prefixes)-1], j))...)
+		}
+	default:
+		output[strings.Join(prefixes, ".")] = fmt.Sprintf("%v", i)
+	}
+}
+
+func loadJsonFileIntoIfExists(path string) ([]byte, string, error) {
+	var readBytes []byte
+	parsedURL, err := url.ParseRequestURI(path)
+	if err == nil && (parsedURL.Scheme == "http" || parsedURL.Scheme == "https") {
+		readBytes, err = config.ReadRemoteFile(path)
+		if err != nil {
+			return []byte{}, "", err
+		}
+		
+		return readBytes, string(readBytes), nil
+
+	} else {
+		info, err := os.Open(path)
+		if err != nil {
+			return []byte{}, "", err
+		}
+		defer info.Close()
+
+		readBytes, _ := ioutil.ReadAll(info)
+
+		return readBytes, string(readBytes), nil
+	}
 }
 
 func loadFileIntoIfExists(path string, destination *string) error {

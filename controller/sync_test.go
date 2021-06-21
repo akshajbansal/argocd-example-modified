@@ -83,6 +83,7 @@ func TestPersistRevisionHistoryRollback(t *testing.T) {
 				{
 					Name:  "test",
 					Value: "123",
+					Metadata: map{"type": "string"},
 				},
 			},
 		},

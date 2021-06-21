@@ -3781,6 +3781,9 @@
       "type": "object",
       "title": "HelmAppSpec contains helm app name  in source repo",
       "properties": {
+        "data": {
+          "type": "string"
+        },
         "fileParameters": {
           "type": "array",
           "title": "helm file parameters",

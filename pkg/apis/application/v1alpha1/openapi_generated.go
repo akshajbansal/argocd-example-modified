@@ -737,7 +737,7 @@ func schema_pkg_apis_application_v1alpha1_ApplicationSourceHelm(ref common.Refer
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
 										Default: map[string]interface{}{},
-										Ref:     ref("github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1.HelmParameter"),
+										Ref:     ref("github.com/argoproj/argo-cd/v2/pkg/apis/application/v1alpha1."),
 									},
 								},
 							},
@@ -2041,6 +2041,13 @@ func schema_pkg_apis_application_v1alpha1_HelmParameter(ref common.ReferenceCall
 						SchemaProps: spec.SchemaProps{
 							Description: "ForceString determines whether to tell Helm to interpret booleans and numbers as strings",
 							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Metadata provides additional data for Helm parameter",
+							Type:        []string{"map[string]string"},
 							Format:      "",
 						},
 					},

@@ -872,12 +872,12 @@ func TestNewHelmParameter(t *testing.T) {
 	t.Run("NonString", func(t *testing.T) {
 		p, err := NewHelmParameter("foo=bar", false)
 		assert.NoError(t, err)
-		assert.Equal(t, &HelmParameter{Name: "foo", Value: "bar"}, p)
+		assert.Equal(t, &HelmParameter{Name: "foo", Value: "bar", Metadata: {"type": "string"}}, p)
 	})
 	t.Run("String", func(t *testing.T) {
 		p, err := NewHelmParameter("foo=bar", true)
 		assert.NoError(t, err)
-		assert.Equal(t, &HelmParameter{Name: "foo", Value: "bar", ForceString: true}, p)
+		assert.Equal(t, &HelmParameter{Name: "foo", Value: "bar", ForceString: true, Metadata: {"type": "string"}}, p)
 	})
 }
 

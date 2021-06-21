@@ -440,6 +440,7 @@ func TestAutoSyncIndicateError(t *testing.T) {
 			{
 				Name:  "a",
 				Value: "1",
+				Metadata: map{"type": "string"},
 			},
 		},
 	}
@@ -475,6 +476,7 @@ func TestAutoSyncParameterOverrides(t *testing.T) {
 			{
 				Name:  "a",
 				Value: "1",
+				Metadata: map{"type": "string"},
 			},
 		},
 	}
@@ -492,6 +494,7 @@ func TestAutoSyncParameterOverrides(t *testing.T) {
 							{
 								Name:  "a",
 								Value: "2", // this value changed
+								Metadata: map{"type": "integer"}, //this metadata changed
 							},
 						},
 					},
@@ -893,6 +896,7 @@ func TestNeedRefreshAppStatus(t *testing.T) {
 			Parameters: []argoappv1.HelmParameter{{
 				Name:  "foo",
 				Value: "bar",
+				Metadata: map{"type": "boolean"},
 			}},
 		}
 

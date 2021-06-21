@@ -1436,7 +1436,7 @@ spec:
 			assert.Equal(t, map[string]string{"annotations.local/from-file": "file"}, app.ObjectMeta.Annotations)
 			assert.Equal(t, []string{"resources-finalizer.argocd.argoproj.io"}, app.ObjectMeta.Finalizers)
 			assert.Equal(t, path, app.Spec.Source.Path)
-			assert.Equal(t, []HelmParameter{{Name: "foo", Value: "foo"}}, app.Spec.Source.Helm.Parameters)
+			assert.Equal(t, []HelmParameter{{Name: "foo", Value: "foo", Metadata: {"type": "string"}}}, app.Spec.Source.Helm.Parameters)
 		})
 }
 

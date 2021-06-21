@@ -586,6 +586,9 @@ message HelmParameter {
 
   // ForceString determines whether to tell Helm to interpret booleans and numbers as strings
   optional bool forceString = 3;
+
+  // Metadata is the additional information for Helm parameter
+  optional map[string]string metadata = 4;
 }
 
 // HostInfo holds host name and resources metrics

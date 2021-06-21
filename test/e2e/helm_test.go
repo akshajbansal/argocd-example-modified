@@ -253,7 +253,7 @@ func TestHelmSet(t *testing.T) {
 		AppSet("--helm-set", "foo=bar", "--helm-set", "foo=baz", "--helm-set", "app=$ARGOCD_APP_NAME").
 		Then().
 		And(func(app *Application) {
-			assert.Equal(t, []HelmParameter{{Name: "foo", Value: "baz"}, {Name: "app", Value: "$ARGOCD_APP_NAME"}}, app.Spec.Source.Helm.Parameters)
+			assert.Equal(t, []HelmParameter{{Name: "foo", Value: "baz", Metadata: {"type": "string"}}, {Name: "app", Value: "$ARGOCD_APP_NAME", Metadata: {"type": "string"}}}, app.Spec.Source.Helm.Parameters)
 		})
 }
 
@@ -265,7 +265,7 @@ func TestHelmSetString(t *testing.T) {
 		AppSet("--helm-set-string", "foo=bar", "--helm-set-string", "foo=baz", "--helm-set-string", "app=$ARGOCD_APP_NAME").
 		Then().
 		And(func(app *Application) {
-			assert.Equal(t, []HelmParameter{{Name: "foo", Value: "baz", ForceString: true}, {Name: "app", Value: "$ARGOCD_APP_NAME", ForceString: true}}, app.Spec.Source.Helm.Parameters)
+			assert.Equal(t, []HelmParameter{{Name: "foo", Value: "baz", ForceString: true, Metadata: {"type": "string"}}, {Name: "app", Value: "$ARGOCD_APP_NAME", ForceString: true, Metadata: {"type": "string"}}}, app.Spec.Source.Helm.Parameters)
 		})
 }
 

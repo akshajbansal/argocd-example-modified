@@ -244,6 +244,8 @@ type HelmParameter struct {
 	Value string `json:"value,omitempty" protobuf:"bytes,2,opt,name=value"`
 	// ForceString determines whether to tell Helm to interpret booleans and numbers as strings
 	ForceString bool `json:"forceString,omitempty" protobuf:"bytes,3,opt,name=forceString"`
+	// Metadata stores additional information about Helm parameter
+	Metadata map[string]string `json:"metadata,omitempty" protobuf:"bytes,4,opt,name=metadata"`  //added this line
 }
 
 // HelmFileParameter is a file parameter that's passed to helm template during manifest generation
@@ -257,7 +259,7 @@ type HelmFileParameter struct {
 var helmParameterRx = regexp.MustCompile(`([^\\]),`)
 
 // NewHelmParameter parses a string in format name=value into a HelmParameter object and returns it
-func NewHelmParameter(text string, forceString bool) (*HelmParameter, error) {
+func NewHelmParameter(text string, forceString bool, metadata map[string]string) (*HelmParameter, error) {
 	parts := strings.SplitN(text, "=", 2)
 	if len(parts) != 2 {
 		return nil, fmt.Errorf("Expected helm parameter of the form: param=value. Received: %s", text)
@@ -266,6 +268,7 @@ func NewHelmParameter(text string, forceString bool) (*HelmParameter, error) {
 		Name:        parts[0],
 		Value:       helmParameterRx.ReplaceAllString(parts[1], `$1\,`),
 		ForceString: forceString,
+		Metadata: 	 metadata,		//added this line with extra parameter in function
 	}, nil
 }
 

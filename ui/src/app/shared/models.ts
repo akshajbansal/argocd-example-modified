@@ -1,4 +1,5 @@
 import {models} from 'argo-ui';
+import { Map } from 'typescript';
 
 interface ItemsList<T> {
     /**
@@ -557,6 +558,7 @@ export interface AppInfo {
 export interface HelmParameter {
     name: string;
     value: string;
+    [metadata: string]: string;  //added this line
 }
 
 export interface HelmFileParameter {
